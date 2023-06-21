@@ -15,73 +15,35 @@ public class EquationTree extends Node implements Checkable {
 
             if (isDouble(equation[i])) {
 
-                try {
-
-                    currentItem = new Number(Double.parseDouble(equation[i]));
-                    i++;
-                } catch (NumberFormatException e) {
-
-                    System.out.println("An unexpected error has occured");
-                    break;
-                } 
+                currentItem = toNumber(equation[i]);
+                i++;
             } else if (isOperator(equation[i])) {
 
-                try {
-
-                    currentItem = new Operator(equation[i]);
-                    i++;
-                } catch (Exception e) {
-
-                    System.out.println("An unexpected error has occured");
-                    break;
-                }
+                currentItem = toOperator(equation[i]);
+                i++;
             } else if (equation[i].equals("(")) {
 
-                int openingParensIndex = i;
-                int closingParensIndex = i;
-                int nestLevel = 0;
+                WrappedEquationTree wrappedTree = toEquationTree(equation, i);
 
-                for (int j = i + 1; j < equation.length; j++) {
+                currentItem = wrappedTree.tree();
+                i = wrappedTree.newIValue();
+            }
 
-                    if (equation[j].equals("(")) {
-                        nestLevel++;
-                    }
+            if (currentItem == null) {
 
-                    if (equation[j].equals(")")) {
-
-                        if (nestLevel > 0) {
-
-                            nestLevel--;
-                        } else {
-
-                            closingParensIndex = j;
-                            break;
-                        }
-                    }
-                }
-
-                if (openingParensIndex == closingParensIndex) {
-                    
-                    System.out.println("An unexpected parens error has occured");
-                    break;
-                } else {
-
-                    String[] subArray = Arrays.copyOfRange(
-                        equation, openingParensIndex + 1, closingParensIndex);
-
-                    currentItem = new EquationTree(subArray);
-
-                    i = closingParensIndex + 1;
-                }
+                System.out.println("An unexpected error has occured");
+                break;
             }
 
             if (head == null) {
 
                 head = currentItem;
             } else {
-
+    
                 head = head.branch(currentItem);
             }
+
+            currentItem = null;
         }
     }
 
@@ -141,8 +103,72 @@ public class EquationTree extends Node implements Checkable {
         };
     }
 
+    private static Number toNumber(String s) {
+        try {
+
+            return new Number(Double.parseDouble(s));
+        } catch (NumberFormatException e) {
+
+            System.out.println("An unexpected error has occured");
+            return null;
+        } 
+    }
+
+    private static Operator toOperator(String s) {
+        try {
+            
+            return new Operator(s);
+        } catch (Exception e) {
+
+            System.out.println("An unexpected error has occured");
+            return null;
+        }
+    }
+
+    private static WrappedEquationTree toEquationTree(String[] equation, int currentIndex) {
+
+        int openingParensIndex = currentIndex;
+        int closingParensIndex = currentIndex;
+        int nestLevel = 0;
+
+        for (int j = currentIndex + 1; j < equation.length; j++) {
+
+            if (equation[j].equals("(")) {
+                nestLevel++;
+            }
+
+            if (equation[j].equals(")")) {
+
+                if (nestLevel > 0) {
+
+                    nestLevel--;
+                } else {
+
+                    closingParensIndex = j;
+                    break;
+                }
+            }
+        }
+
+        if (openingParensIndex == closingParensIndex) {
+                    
+            System.out.println("An unexpected parens error has occured");
+            return null;
+        } else {
+
+            String[] subArray = Arrays.copyOfRange(
+                equation, openingParensIndex + 1, closingParensIndex);
+
+            return new WrappedEquationTree(new EquationTree(subArray), 
+                    closingParensIndex + 1);
+        }
+    }
+
     @Override
     public String toString() {
         return "EquationTree (" + head + ")";
     }
+
+    private static record WrappedEquationTree(EquationTree tree, 
+            int newIValue) {}
 }
