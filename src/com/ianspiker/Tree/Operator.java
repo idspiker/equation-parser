@@ -69,7 +69,7 @@ class Operator extends Node implements Checkable {
 
     @Override
     public Node branch(Node node) {
-
+        
         if (this.compareTo(node) >= 0 && node instanceof Operator operator) {
 
             operator.setLeft(this);
@@ -82,7 +82,7 @@ class Operator extends Node implements Checkable {
             right = node;
             node.setParent(this);
         } else if (right instanceof Node rightNode) {
-
+            
             rightNode.branch(node);
         }
 

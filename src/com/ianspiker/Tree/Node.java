@@ -1,22 +1,14 @@
 package com.ianspiker.Tree;
 
-abstract class Node implements Evaluable {
+abstract class Node implements Evaluable, Comparable<Node> {
     
     private Node parent;
-
-    Node() {
-        this(null);
-    }
-
-    Node(Node parent) {
-        this.parent = parent;
-    }
 
     public abstract Node branch(Node node);
 
     public abstract PEDMASLevel getPedmasScore();
 
-    int compareTo(Node o) {
+    public int compareTo(Node o) {
 
         return PEDMASLevel.getComparator()
                 .compare(getPedmasScore(), o.getPedmasScore());
