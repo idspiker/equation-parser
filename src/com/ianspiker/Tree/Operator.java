@@ -70,33 +70,20 @@ class Operator extends Node implements Checkable {
     @Override
     public Node branch(Node node) {
 
-        int comparison = this.compareTo(node);
+        if (this.compareTo(node) >= 0 && node instanceof Operator operator) {
 
-        if (comparison < 0) {
+            operator.setLeft(this);
+            node.setParent(this.getParent());
+            setParent(node);
 
-            if (right == null) {
+            return node;
+        } else if (right == null) {
 
-                right = node;
-                node.setParent(this);
-            } else {
+            right = node;
+            node.setParent(this);
+        } else if (right instanceof Node rightNode) {
 
-                if (right instanceof Node r) {
-
-                    r.branch(node);
-                }
-            }
-
-            return this;
-        } else {
-
-            if (node instanceof Operator o) {
-
-                o.setLeft(this);
-                node.setParent(this.getParent());
-                setParent(node);
-
-                return node;
-            }
+            rightNode.branch(node);
         }
 
         return this;

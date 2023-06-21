@@ -23,21 +23,21 @@ class Number extends Node {
     @Override
     public Node branch(Node node) {
 
-        if (this.compareTo(node) > 0) {
-
-            if (node instanceof Operator o) {
-                o.setLeft(this);
-                if (this.getParent() instanceof Operator p) {
-                    
-                    p.setRight(node);
-                }
-                node.setParent(this.getParent());
-                setParent(node);
-                return node;
-            }
+        if (this.compareTo(node) <= 0 || !(node instanceof Operator)) {
+            return this;
         }
 
-        return this;
+        Operator operator = (Operator) node;
+        operator.setLeft(this);
+
+        if (this.getParent() instanceof Operator p) {
+                
+            p.setRight(node);
+        }
+
+        node.setParent(this.getParent());
+        setParent(node);
+        return node;
     }
 
     @Override

@@ -4,14 +4,6 @@ import java.util.Arrays;
 
 public class EquationTree extends Node implements Checkable {
 
-    // Take string array as an argument, and parse the values according
-    // to branch procedure. When you find an opening parens in the
-    // array, find the closing parens and dump the entire sublist 
-    // between into a recursive constructor call for equation tree.
-    // The resulting tree will be treated just like any other
-    // evaluatable node, which gets rid of the need for special
-    // parenthetical context and stack.
-
     private Node head;
 
     public EquationTree(String[] equation) {
@@ -118,17 +110,15 @@ public class EquationTree extends Node implements Checkable {
     @Override
     public Node branch(Node node) {
 
-        if (this.compareTo(node) > 0) {
-
-            if (node instanceof Operator o) {
-                o.setLeft(this);
-                node.setParent(this.getParent());
-                setParent(node);
-                return node;
-            }
+        if (this.compareTo(node) <= 0 || !(node instanceof Operator)) {
+            return this;
         }
 
-        return this;
+        Operator operator = (Operator) node;
+        operator.setLeft(this);
+        node.setParent(this.getParent());
+        setParent(node);
+        return node;
     }
 
     private static boolean isDouble(String s) {
